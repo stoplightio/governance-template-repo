@@ -37,7 +37,7 @@ paths:
                     signUpDate: '2019-08-24'
         '404':
           description: User Not Found
-      operationId: get-users-userId
+      operationId: hello
       description: Retrieve the information of the user with the matching user ID.
       x-stoplight:
         id: rujm9sn6lg0pz
