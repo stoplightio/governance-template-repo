@@ -36,13 +36,13 @@ paths:
                     emailVerified: true
                     signUpDate: '2019-08-24'
         '404':
-          description: User Not Found
+          description: User # sad;klsadl;sad
       operationId: hello
       description: Retrieve the information of the user with the matching user ID.
       x-stoplight:
         id: rujm9sn6lg0pz
     patch:
-      summary: Update User Information
+      summary: Update User Information #l;aksdl;kasdl
       operationId: patch-users-userId
       responses:
         '200':
