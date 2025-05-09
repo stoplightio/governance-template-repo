@@ -1,0 +1,1633 @@
+openapi: 3.1.0
+x-stoplight:
+  id: maarjp9dhhbse
+info:
+  version: '1.0'
+  title: PayIn
+  summary: PayIn API for Ozow to effect payments.
+  description: 'Payments API for Ozow that allows for payments, refunds, settlements, and more.'
+  termsOfService: 'https://ozow.com/terms-and-conditions'
+  contact:
+    name: Ozow Support
+    url: 'https://www.ozow.com'
+    email: support@ozow.com
+  license:
+    name: ''
+servers:
+  - url: 'https://stagingapi.ozow.com'
+    description: Staging
+  - url: 'https://api.ozow.com'
+    description: Production
+paths:
+  /PostPaymentRequest:
+    post:
+      tags:
+        - payments
+      summary: Create Payment Request
+      description: Creates a payment request with the requested parameter set.
+      operationId: post-PostPaymentRequest
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRequestResult'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/PaymentRequestResult'
+      security:
+        - ApiKey: []
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: nyldjhx5fs0kn
+  /GetTransactionByReference:
+    get:
+      tags:
+        - payments
+      summary: Get Transaction By Reference
+      description: "This operation is used  when you want to query transactions using the merchant's transaction reference, specified when creating the payment request. \r\nThis method is able to return multiple results. Ozow does not restrict the merchant from sending duplicate merchant references, though it is advised that a unique reference is sent per transaction. The number of results returned are limited to 10.\r\nNote that the site code must be the same as the one used when the associated payment request was created."
+      operationId: get-GetTransactionByReference
+      parameters:
+        - $ref: '#/components/parameters/siteCode'
+        - $ref: '#/components/parameters/transactionReference'
+        - $ref: '#/components/parameters/isTest'
+      requestBody:
+        description: 'This method is called when you want to query transactions using the merchant''s reference. This method is able to return multiple results. Ozow does not restrict the merchant from sending duplicate merchant references, though it is advised that a unique reference is sent per transaction. The number of results returned are limited to 10.'
+        content: {}
+      responses:
+        '200':
+          $ref: '#/components/responses/Transactions'
+      security:
+        - ApiKey: []
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: rpo19ww616dgn
+  /GetTransaction:
+    get:
+      tags:
+        - payments
+      summary: Get Transaction
+      description: This method is called when you want to query transactions using Ozow's reference.
+      operationId: get-GetTransaction
+      parameters:
+        - $ref: '#/components/parameters/siteCode'
+        - $ref: '#/components/parameters/transactionId'
+      requestBody:
+        content: {}
+      responses:
+        '200':
+          $ref: '#/components/responses/Transactions'
+      security:
+        - ApiKey: []
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: 7y7440sfft0l3
+  /GetTransactionReport:
+    get:
+      tags:
+        - payments
+      summary: Get Transaction Report
+      description: This operation is used to get all transactions for a merchant site in a particular date range.
+      operationId: get-GetTransactionReport
+      parameters:
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/siteCode'
+        - $ref: '#/components/parameters/endDate'
+      responses:
+        '200':
+          description: Array of TransactionModel
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionModel'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionModel'
+      security:
+        - ApiKey: []
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: 658hllynolmw4
+  /token:
+    post:
+      tags:
+        - authorization
+      summary: Get API token
+      description: All requests are authenticated using the token you will receive from this request. The same token can be used for all requests until it expires. The only content type supported by this operation is "application/x-www-form-urlencoded".
+      operationId: post-token
+      parameters:
+        - name: ApiKey
+          in: header
+          description: 'Your merchant API key [Please contact support for Key - support@ozow.com]'
+          required: true
+          schema:
+            type: string
+            maxLength: 50
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Token'
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: 4cbg8iobu362y
+  /secure/refunds/submit:
+    post:
+      tags:
+        - refunds
+      summary: Submit refund
+      description: Submit refunds to Ozow for processing.
+      operationId: post-secure-refunds-submit
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+      requestBody:
+        description: An array of refund requests.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/RefundRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RefundRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/RefundResponse'
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: nery4u2l6s8il
+  /secure/refunds/getrefunds:
+    get:
+      tags:
+        - refunds
+      summary: Get refunds
+      description: List refunds by date and status.
+      operationId: get-secure-refunds-getrefunds
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - name: refundDate
+          in: query
+          description: The date of the refunds you would like to be returned.
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: The status of the refunds you would like to be returned.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Refund'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Refund'
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: 1c3rd66n38r5w
+  /secure/refunds/getrefund:
+    get:
+      tags:
+        - refunds
+      summary: Get refund
+      description: ' Query a refund using the Ozow refund identifier.'
+      operationId: get-secure-refunds-getrefund
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - name: refundId
+          in: query
+          description: Ozow's identifier for the refund. This identifier is passed back to the merchant in the SubmitRefunds response’s RefundId field.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Refund'
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: fzp6q6ck8tn8e
+  /secure/refunds/getrefundsbytransactionid:
+    get:
+      tags:
+        - refunds
+      summary: Get refunds by transaction ID
+      description: Retrieves all refunds linked to a specific Ozow transaction.
+      operationId: get-secure-refunds-getrefundsbytransactionid
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - name: transactionId
+          in: query
+          description: Ozow's identifier for original payment transaction. This is passed back to the merchant in the payment redirect and notification response’s TransactionId field.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Refund'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Refund'
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: jmbztfcap8s96
+  /secure/settlements:
+    get:
+      tags:
+        - settlements
+      summary: Get Settlements
+      description: Retrieve the lastest settlements created for the merchant.
+      operationId: get-secure-settlements
+      parameters:
+        - name: count
+          in: query
+          description: The number of settlements to return. The max allowed value is 100.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        2XX:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettlementList'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SettlementList'
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: o04bb6gqpkx9j
+  /secure/settlements/getsitesettlements:
+    get:
+      tags:
+        - settlements
+      summary: Get Site Settlements
+      operationId: get-secure-settlements-getsitesettlements
+      parameters:
+        - name: fromDate
+          in: query
+          description: 'Desired start date to retrieve respective merchant site settlements.  Format: yyyy-mm-dd '
+          required: true
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          description: 'Desired end date to retrieve respective merchant site settlements.  Format: yyyy-mm-dd'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SiteSettlement'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SiteSettlement'
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: 42kyp015je767
+  /secure/bulkpaymentrequests/create:
+    get:
+      tags:
+        - bulkpaymentrequest
+      summary: Create Bulk Payment Request
+      operationId: get-secure-bulkpaymentrequests-create
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkPaymentRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/BulkPaymentRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkPaymentResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BulkPaymentResponse'
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: nmcqbr2y8mcbj
+  /secure/bulkpaymentrequests/getbulkjobbyreference:
+    get:
+      tags:
+        - bulkpaymentrequest
+      summary: Get Bulk Job Status
+      operationId: get-secure-bulkpaymentrequests-getbulkjobbyreference
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - name: reference
+          in: query
+          description: 'Use the Job Reference that was used when creating a new bulk job via Create endpoint '
+          required: true
+          schema:
+            type: string
+            maxLength: 100
+      responses: {}
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: fz1wylhapa3rv
+  /secure/banktransfer/single:
+    post:
+      tags:
+        - bankdeposit
+      summary: Create Unique Reference
+      operationId: post-secure-banktransfer-single
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankDepositRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleBankDepositResponse'
+      security:
+        - ApiKey: []
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: 23i2zwhxcy2mf
+  /secure/banktransfer/multiple:
+    post:
+      tags:
+        - bankdeposit
+      summary: Create Static Reference
+      operationId: post-secure-banktransfer-multiple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankDepositRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiBankDepositResponse'
+      security:
+        - ApiKey: []
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: 0u1unqw9e9jgu
+  '/secure/banktransfer/bankingdetails/{bankreferenceid}':
+    get:
+      tags:
+        - bankdeposit
+      summary: Get Banking Details
+      operationId: get-secure-banktransfer-bankingdetails-bankreferenceid
+      parameters:
+        - name: bankreferenceid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankingDetails'
+      security:
+        - ApiKey: []
+      servers:
+        - url: 'https://stagingapi.ozow.com'
+          description: Staging
+        - url: 'https://api.ozow.com'
+          description: Production
+      x-stoplight:
+        id: 3jl93y9yveccx
+components:
+  parameters:
+    siteCode:
+      name: siteCode
+      in: query
+      description: A unique code for the each of the merchant's sites. A site code is generated when adding a site in the Ozow merchant admin section.
+      required: true
+      schema:
+        type: string
+        maxLength: 50
+        examples:
+          - TST-MER-001
+    transactionId:
+      name: transactionId
+      in: query
+      description: Ozow's reference for the transaction. This is passed back to the merchant in the redirect and notification responses.
+      required: true
+      schema:
+        type: string
+        format: uuid
+        maxLength: 50
+        examples:
+          - 33857766-f29a-4a3a-a37e-66db3c42e439
+    transactionReference:
+      name: transactionReference
+      in: query
+      description: The merchant's reference for the transaction.
+      required: true
+      schema:
+        type: string
+        maxLength: 50
+        examples:
+          - MyReference
+    isTest:
+      name: isTest
+      in: query
+      description: Defaults to false. Use true only to get results for test requests.
+      required: false
+      schema:
+        type: boolean
+        examples:
+          - false
+    startDate:
+      name: startDate
+      in: query
+      description: The filter start date. Use format YYYY-MM-DD.
+      required: true
+      schema:
+        type: string
+        format: date
+        minLength: 10
+        maxLength: 10
+        examples:
+          - '2024-01-02'
+    endDate:
+      name: endDate
+      in: query
+      description: 'The filter end date. Use format YYYY-MM-DD.  If used with a `startDate`, `endDate` must be larger than `startDate`.'
+      required: true
+      schema:
+        type: string
+        minLength: 10
+        maxLength: 10
+        examples:
+          - '2024-02-03'
+    Authorization:
+      name: Authorization
+      in: header
+      description: 'The token generated using the get token method. eg. Authorization: Bearer [token]'
+      required: true
+      schema:
+        type: string
+        maxLength: 500
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      description: 'The unique API key for the merchant.  See [documentation](https://ozow.stoplight.io/docs/payin-api/fejwfiuhhr4i8-before-you-begin) for details on how to retrieve this.'
+      name: API Key
+      in: header
+  responses:
+    Transactions:
+      description: Array of transactions.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Transaction'
+    Settlements:
+      description: ''
+  schemas:
+    PaymentRequest:
+      type: object
+      title: PaymentRequest
+      description: Request for creating a payment request.
+      properties:
+        siteCode:
+          type: string
+          description: A unique code for the site currently in use. A site code is generated when adding a site in the Ozow merchant admin section.
+          maxLength: 50
+        countryCode:
+          type: string
+          description: The ISO 3166-1 alpha-2 code for the user's country. The country code will determine which banks will be displayed to the customer. Please note only South African (ZA) banks are currently supported by Ozow.
+          pattern: '^[A-Z]+'
+          maxLength: 2
+          examples:
+            - ZA
+        currencyCode:
+          type: string
+          description: 'The ISO 4217 three-letter code for the transaction currency. Please note only the South African Rand (ZAR) is currently supported by Ozow, so any currency conversion must take place before posting to the Ozow site.'
+          pattern: '^[A-Z]+'
+          maxLength: 3
+          examples:
+            - ZAR
+        amount:
+          type: number
+          description: The transaction amount. The amount is in the currency specified by the currency code posted.
+          format: double
+          examples:
+            - 150.2
+        transactionReference:
+          type: string
+          description: The merchant's reference for the transaction.  This reference can be used to look up the transaction with the `GetTransactionByReference` operation.
+          maxLength: 50
+        bankReference:
+          type: string
+          description: 'The reference that will be pre-populated in the "their reference" field in the customers online banking site. This is the payment reference that appears on the merchant’s bank statement and can be used for recon purposes. Only alphanumeric characters, spaces, and dashes are allowed.'
+          maxLength: 20
+        optional1:
+          type: string
+          description: 'Optional field the merchant can post for additional information they would need passed back in the response. These are also stored with the transaction details by Ozow, and can be useful for filtering transactions in the merchant admin section.'
+          maxLength: 50
+        optional2:
+          type: string
+          description: 'Optional field the merchant can post for additional information they would need passed back in the response. These are also stored with the transaction details by Ozow, and can be useful for filtering transactions in the merchant admin section.'
+          maxLength: 50
+        optional3:
+          type: string
+          description: 'Optional field the merchant can post for additional information they would need passed back in the response. These are also stored with the transaction details by Ozow, and can be useful for filtering transactions in the merchant admin section.'
+          maxLength: 50
+        optional4:
+          type: string
+          description: 'Optional field the merchant can post for additional information they would need passed back in the response. These are also stored with the transaction details by Ozow, and can be useful for filtering transactions in the merchant admin section.'
+          maxLength: 50
+        optional5:
+          type: string
+          description: 'Optional field the merchant can post for additional information they would need passed back in the response. These are also stored with the transaction details by Ozow, and can be useful for filtering transactions in the merchant admin section.'
+          maxLength: 50
+        customer:
+          type: string
+          description: The customer’s name or identifier.
+          maxLength: 100
+        cancelUrl:
+          type: string
+          description: 'The URL to which the redirect result should be posted to if the customer cancels the payment. This is also the page the customer will be redirected to. This URL can also be set for the applicable merchant site in the merchant admin section. If a value is set in the merchant admin and sent in the post, the posted value will be redirected to if the payment is cancelled.'
+          format: uri
+          maxLength: 150
+        errorUrl:
+          type: string
+          description: 'The URL to which the redirect result should be posted if an error occurs while trying to process the payment. This is also the page the customer will be redirected to. This URL can also be set for the applicable merchant site in the merchant admin section. If a value is set in the merchant admin and sent in the post, the posted value will be redirected to if an error occurred while processing the payment.'
+          format: uri
+          maxLength: 150
+        successUrl:
+          type: string
+          description: "The URL to which the redirect result should be posted to if the payment is successful. This is also be the page the customer gets redirected to. This URL can also be set for the applicable merchant site in the merchant admin section. If a value is set\r\nin the merchant admin and sent in the post, the posted value will be redirected to if the payment was successful.\r\n\r\nPlease note that it is not sufficient to assume that the payment was successful simply because the customer has been redirected back to this page. It is highly recommended that you check the response fields as well as the transaction status using our check transaction status API call."
+          format: uri
+          maxLength: 150
+        notifyUrl:
+          type: string
+          description: "The URL that the notification result should be posted to. The result will post regardless of the outcome of the transaction. This URL can also be set for the applicable merchant site in the\r\nmerchant admin section. If a value is set in the merchant admin and sent in the post, the notification result will be sent to the posted value. Find out more in the notification response section in step 2."
+          format: uri
+          maxLength: 150
+        isTest:
+          type: boolean
+          description: "Accepted values are true or false. Send true to test your request posting and response handling. If set to true you will be redirected to select whether you would like a successful or unsuccessful redirect response sent back.\r\n\r\nPlease note that notification responses are sent for test transactions and the online banking payment is skipped. "
+        selectedBankId:
+          type: string
+          description: "If the 'SelectedBankId' field is populated by the Merchant, the Customer will be redirected to the Ozow login page of the selected bank. However, if the field is left empty, the Customer will be presented with Ozow bank selection screen.\r\n\r\nPlease reference the [accepted bank list](/docs/payin-api/branches/main/6fah7ggcpl94y-bank-connections#bank-identifiers) for possible values."
+          format: uuid
+        bankAccountNumber:
+          type: string
+          description: The bank account number the payment should be made to.
+          maxLength: 20
+        branchCode:
+          type: string
+          description: The branch code for the bank account.
+          maxLength: 10
+        bankAccountName:
+          type: string
+          description: The name to be used for the bank account. Only alphanumeric characters and spaces allowed.
+          pattern: '^[0-9 ]+'
+          maxLength: 50
+          examples:
+            - '405264466544'
+        payeeDisplayName:
+          type: string
+          description: The name shown on the site as the entity being paid (not in banking screens).
+          maxLength: 50
+        expiryDateUtc:
+          type: string
+          description: 'Payment will not be allowed to be made after this date. Date should be UTC and value should be formatted as yyyy-MM-dd HH:mm'
+          maxLength: 19
+          examples:
+            - '2015-08-11 16:02'
+        allowVariableAmount:
+          type: boolean
+          description: 'Allows the user to change the amount passed through before paying. This option must also be enabled for the site in the merchant admin portal to be used. Accepted values are true or false. DO NOT include false in the hash check string, just ignore instead.'
+        variableAmountMin:
+          type: number
+          description: 'If AllowVariableAmount is passed through as true, this will dictate the lowest acceptable amount the user can enter.'
+          format: double
+          examples:
+            - 1
+        variableAmountMax:
+          type: number
+          description: 'If AllowVariableAmount is passed through as true, this will dictate the highest acceptable amount the user can enter.'
+          format: double
+          examples:
+            - 150
+        customerIdentifier:
+          type: string
+          description: 'Merchants classified as high-risk must provide a valid South African identity number. It''s important to note that this is an optional field for all other merchants. For more details see [Capitec High Risk Integration](/docs/payin-api/auk2z2e4ybrv5-capitec-pay-high-risk-integration), or reach out to [support@ozow.com](mail:support@ozow.com).'
+          maxLength: 13
+          examples:
+            - '8007897546456'
+        customerCellphoneNumber:
+          type: string
+          description: 'Merchant can provide customer cellphone number for faster login on certain banks. DO NOT include in the hash check string, just ignore instead.'
+          pattern: '^[0-9]+'
+          maxLength: 10
+          examples:
+            - '0794567855'
+        hashCheck:
+          type: string
+          description: 'SHA512 hash used to ensure that certain fields in the message have not been altered after the hash was generated. Please see the [generate hash section](/docs/payin-api/f1oidk1k60jc5-step-1-post-from-merchant-website#generate-post-hash-check) for more details on how to generate the hash.'
+          maxLength: 250
+      required:
+        - siteCode
+        - countryCode
+        - currencyCode
+        - amount
+        - transactionReference
+        - bankReference
+        - isTest
+        - hashCheck
+      x-tags:
+        - payments
+      x-stoplight:
+        id: qsvdst20tuud4
+    PaymentRequestResult:
+      type: object
+      title: PaymentRequestResult
+      description: Response to creating a payment request.
+      properties:
+        paymentRequestId:
+          type: string
+          description: Ozow's unique identifier for the payment request.
+          format: uuid
+          maxLength: 50
+          examples:
+            - 00000000-0000-0000-0000-000000000000
+        url:
+          type: string
+          description: "Generated URL that allows payment for the request used to create the payment.  You will need to redirect the payer to this URL, who upon completion of the payment will be redirected back to your site.\r\n\r\n**The payment Url you'll receive from the API is dynamic. Please do not hard code it into your integrations as it might change.**"
+          format: uri
+          maxLength: 100
+          examples:
+            - 'https://pay.ozow.com/00000000-0000-0000-0000-000000000000/Secure'
+        errorMessage:
+          type: string
+          description: Error message generated when validating the request.
+          maxLength: 50
+      required:
+        - paymentRequestId
+        - url
+      x-tags:
+        - payments
+      x-stoplight:
+        id: 4iwis8g36a7bz
+    TransactionModel:
+      type: object
+      title: TransactionModel
+      description: Represents the full dataset of a transaction.
+      properties:
+        id:
+          type: string
+          description: The transaction identifier generated by Ozow.
+          format: uuid
+          maxLength: 50
+          examples:
+            - 33857766-f29a-4a3a-a37e-66db3c42e439
+        createdDateUtc:
+          type: string
+          description: Date the transaction was created.
+          pattern: '2024-01-20 14:12:34'
+        siteCode:
+          type: string
+          description: The site code sent to Ozow in the request post.
+          maxLength: 50
+        siteName:
+          type: string
+          description: Merchant site name.
+          maxLength: 50
+        bankFromName:
+          type: string
+          description: he bank the payment has been made from.
+          maxLength: 50
+        bankToName:
+          type: string
+          description: he bank the payment has been made to.
+          maxLength: 50
+        amount:
+          type: number
+          description: The transaction amount. The amount is in the currency specified by the currency code posted.
+          format: double
+        status:
+          type: string
+          description: "The transaction status. Possible values are:\r\n1. Complete - The payment was successful.\r\n2. Cancelled - The payment was cancelled.\r\n3. Error - An error occurred while processing the payment.\r\n4. Abandoned – The payment was abandoned.\r\n5. PendingInvestigation – An inconclusive result was received by the bank and the payment needs to be verified manually.\r\n6. Pending – The status cannot be determined as yet but will be reposted to the notification URL as soon as it has been determined. Merchants not using the notification URL will receive a PendingInvestigation status."
+          maxLength: 50
+          examples:
+            - Complete
+        toAccount:
+          type: string
+          description: he account number.
+          maxLength: 50
+        toReference:
+          type: string
+          description: The bank reference that was used to make the payment.
+          maxLength: 50
+        paymentDate:
+          type: string
+          description: Date the payment was successfully completed.
+          format: date
+          maxLength: 50
+        paymentDateUtc:
+          type: string
+          description: UTC date the payment was successfully completed.
+          format: date
+          maxLength: 50
+        transactionReference:
+          type: string
+          description: The merchant's transaction reference sent in the request post's TransactionReference variable.
+          maxLength: 50
+        customer:
+          type: string
+          description: Customer’s name
+          maxLength: 50
+        optional1:
+          type: string
+          description: Optional fields sent in the request post.
+          maxLength: 50
+        optional2:
+          type: string
+          description: Optional fields sent in the request post.
+          maxLength: 50
+        optional3:
+          type: string
+          description: Optional fields sent in the request post.
+          maxLength: 50
+        optional4:
+          type: string
+          description: Optional fields sent in the request post.
+          maxLength: 50
+        optional5:
+          type: string
+          description: Optional fields sent in the request post.
+          maxLength: 50
+        lastEvent:
+          type: string
+          description: 'Used for administration purposes, will be empty for most merchants.'
+          maxLength: 50
+        lastEventStatus:
+          type: string
+          description: 'Used for administration purposes, will be empty for most merchants.'
+          maxLength: 50
+      required:
+        - id
+        - createdDateUtc
+        - siteCode
+        - siteName
+        - amount
+        - status
+        - transactionReference
+        - lastEvent
+      x-tags:
+        - payments
+      x-stoplight:
+        id: w7z4dnb6f7ovf
+    TokenRequest:
+      type: object
+      title: TokenRequest
+      properties:
+        grant_type:
+          type: string
+          description: Set as "Password".
+          maxLength: 50
+        SiteCode:
+          type: string
+          description: 'The Ozow site code for the site which the payment is being made to. [Please contact support for SiteCode - support@ozow.com]'
+          maxLength: 50
+      required:
+        - grant_type
+        - SiteCode
+      x-tags:
+        - authorization
+      x-stoplight:
+        id: svdsudqw605vx
+    Token:
+      type: object
+      title: Token
+      properties:
+        access_token:
+          type: string
+          description: The token needed for subsequent requests.
+          maxLength: 500
+        token_type:
+          type: string
+          description: The token type.
+          maxLength: 50
+        expires_in:
+          type: string
+          description: The lifetime of the token in seconds.
+          maxLength: 50
+      required:
+        - access_token
+        - token_type
+        - expires_in
+      x-tags:
+        - authorization
+      x-stoplight:
+        id: bac5s0ei0usae
+    RefundRequest:
+      type: object
+      title: RefundRequest
+      properties:
+        transactionId:
+          type: string
+          description: The transaction identifier. This is the identifier for the payment that was originally processed on Ozow.
+          format: uuid
+        amount:
+          type: number
+          description: The amount that needs to be refunded. This can be less than the original transaction amount but not more.
+          format: double
+          examples:
+            - 20.44
+        refundReason:
+          type: string
+          description: The reason for the refund.
+          maxLength: 500
+        notifyUrl:
+          type: string
+          description: The URL Ozow will send a notification to once the refund has been finalised.
+          format: uri
+          maxLength: 500
+        hashCheck:
+          type: string
+          description: SHA512 hash used to ensure that certain fields in the message have not been altered after the hash was generated. Check the generate hash section below for more details on how to generate the hash.
+          maxLength: 150
+        isRtc:
+          type: boolean
+          description: Whether the refund should be processed as an RTC refund.
+          default: false
+      required:
+        - transactionId
+        - amount
+        - hashCheck
+      x-tags:
+        - refunds
+      x-stoplight:
+        id: 9wza3vvrrw2t9
+    RefundResponse:
+      type: object
+      title: RefundResponse
+      properties:
+        refundId:
+          type: string
+          description: The identifier for the refund that was created. No identifier is returned if there was an error creating the refunds.
+          format: uuid
+        transactionId:
+          type: string
+          description: The transaction identifier. This will correspond to one of the transaction identifiers passed through in the request.
+          format: uuid
+        refundAmount:
+          type: string
+          description: The refund amount.
+        errors:
+          type: array
+          description: Validation errors for the specific refund.
+          items:
+            type: string
+      required:
+        - refundId
+        - transactionId
+        - refundAmount
+      x-tags:
+        - refunds
+      x-stoplight:
+        id: x8l9w63mpyi8i
+    Refund:
+      type: object
+      title: Refund
+      description: A complete representation of a refund in Ozow's systems.
+      properties:
+        id:
+          type: string
+          description: The identifier for the refund.
+          format: uuid
+        createdDate:
+          type: string
+          description: The date the refund was created.
+          format: date-time
+        createdDateUtc:
+          type: string
+          description: The UTC date the refund was created.
+          format: date-time
+        merchantCode:
+          type: string
+          description: Corresponding merchant code of the refund.
+        siteCode:
+          type: string
+          description: Corresponding site code of the refund.
+        siteName:
+          type: string
+          description: Corresponding site name of the refund.
+        bankToName:
+          type: string
+          description: Bank the refund was sent to.
+        currencyCode:
+          type: string
+          description: Refund currency.
+          maxLength: 3
+        amount:
+          type: number
+          description: Refund amount.
+          format: double
+          examples:
+            - 15.2
+        statementReference:
+          type: string
+          description: Bank reference of the refund for the payer.
+        status:
+          type: integer
+          description: "Refund status.  Possible values are:\r\n\r\n* 0 - Pending - The refund request has been submitted and accepted.\r\n* 1 - Complete - The refund has been paid successfully.\r\n* 2 - Submitted - The refund has been assigned to a batch and is being processed.\r\n* 3 - Failed - The refund payment has failed.\r\n* 4 - Cancelled - The refund has been cancelled before it was submitted.\r\n* 5 - Returned - The refund payment has been returned because the account that was being refunded no longer exists."
+          examples:
+            - 1
+        toAccount:
+          type: string
+          description: Account number refund was sent to.
+        paymentDate:
+          type: string
+          description: Payment date of the refund.
+          format: date-time
+        transactionReference:
+          type: string
+          description: Reference of the transaction which was refunded.
+        customer:
+          type: string
+          description: Refunded transaction customer.
+        lastEvent:
+          type: string
+          description: Most recent log activity of the refund.
+        refundCompletedDate:
+          type: string
+          description: The date the refund was completed.
+          format: date-time
+        createdBy:
+          type: string
+          description: Name of the user who created the refund.
+        isRtc:
+          type: boolean
+          description: '`True` if the refund was paid via RTC.'
+      required:
+        - id
+        - createdDate
+        - createdDateUtc
+        - merchantCode
+        - siteCode
+        - siteName
+        - bankToName
+        - currencyCode
+        - amount
+        - statementReference
+        - status
+        - toAccount
+        - paymentDate
+        - transactionReference
+        - lastEvent
+        - createdBy
+        - isRtc
+      x-tags:
+        - refunds
+      x-stoplight:
+        id: q28jjlcr9nilx
+    SettlementList:
+      type: object
+      title: SettlementList
+      description: A list of settlements.
+      properties:
+        settlements:
+          type: array
+          description: The latest settlements for the merchant.
+          items:
+            $ref: '#/components/schemas/Settlement'
+        errors:
+          type: array
+          description: Any errors that occurred for the request.
+          items:
+            type: string
+      required:
+        - settlements
+        - errors
+      x-tags:
+        - settlements
+      x-stoplight:
+        id: 3eixiiau5zi3j
+    Settlement:
+      type: object
+      title: Settlement
+      description: A settlement.
+      properties:
+        id:
+          type: string
+          description: The settlement identifier.
+          format: uuid
+        date:
+          type: string
+          description: The settlement date.
+        originalAmount:
+          type: number
+          description: The amount in the original transaction currency.
+          format: double
+          minimum: 0
+          examples:
+            - 5000
+        originalCurrencyCode:
+          type: string
+          description: The original transaction currency code (ISO 4217 3 letter code).
+          minLength: 3
+          maxLength: 3
+        bankReference:
+          type: string
+          description: The Ozow alphanumeric reference for the settlement.
+          maxLength: 20
+        amount:
+          type: number
+          description: The amount in the settlement currency.
+          format: double
+          minimum: 0
+        currencyCode:
+          type: string
+          description: The settlement currency code (ISO 4217 3 letter code).
+          minLength: 3
+          maxLength: 3
+        conversionRate:
+          type: number
+          description: The currency conversation rate at the time the settlement was created.
+          format: double
+          minimum: 0
+        accountNumber:
+          type: string
+          description: The destination account number for the settlement.
+          maxLength: 50
+        status:
+          type: string
+          description: "The settlement status. Possible values are:\r\n\r\n* Pending - Settlement was created\r\n* Complete - Settlement payment has been initiated\r\n"
+          maxLength: 50
+        createdByUserName:
+          type: string
+          description: The user that created the settlement.
+          maxLength: 50
+        createdDate:
+          type: string
+          description: The date and time that the settlement was created.
+        createdDateUtc:
+          type: string
+          description: The UTC date and time that the settlement was created.
+      required:
+        - id
+        - date
+        - originalAmount
+        - originalCurrencyCode
+        - bankReference
+        - amount
+        - currencyCode
+        - conversionRate
+        - accountNumber
+        - status
+        - createdByUserName
+        - createdDate
+        - createdDateUtc
+      x-tags:
+        - settlements
+      x-stoplight:
+        id: png8lpw2hlqvv
+    SiteSettlement:
+      type: object
+      title: SiteSettlement
+      description: A settlement for a specific site.
+      properties:
+        settlementId:
+          type: string
+          description: The settlement identifier.
+          format: uuid
+        settlementDate:
+          type: string
+          description: The date and time that the settlement was created.
+        toReference:
+          type: string
+          description: Payee Reference.
+          maxLength: 20
+        amount:
+          type: number
+          description: The amount in the settlement currency.
+          format: double
+          minimum: 0
+        bankReference:
+          type: string
+          description: The Ozow alphanumeric reference for the settlement.
+          maxLength: 20
+        status:
+          type: integer
+          description: "The settlement status. Possible values are:\r\n\r\n* Pending - Settlement was created\r\n* Complete - Settlement payment has been initiated\r\n"
+        siteCode:
+          type: string
+          description: The UTC date and time that the settlement was created.
+          maxLength: 20
+        transactionCreatedDate:
+          type: string
+          description: The UTC date and time that the settlement was created.
+        transactionId:
+          type: string
+          description: The transaction identifier. This is the identifier for the payment that was originally processed on Ozow.
+          format: uuid
+        transactionReference:
+          type: string
+          description: Reference of the transaction which was settled.
+          maxLength: 20
+      required:
+        - settlementId
+        - settlementDate
+        - toReference
+        - amount
+        - bankReference
+        - status
+        - siteCode
+        - transactionCreatedDate
+        - transactionId
+        - transactionReference
+      x-tags:
+        - settlements
+      x-stoplight:
+        id: 1mrcn9pwh9xpd
+    BulkPaymentRequest:
+      type: object
+      title: BulkPaymentRequest
+      properties:
+        jobReference:
+          type: string
+          description: The merchant reference for the job/batch of payment requests to be created.
+          maxLength: 100
+        notifyUrl:
+          type: string
+          description: The URL where the results for the job will be posted to after the job has been processed.
+          format: uri
+          maxLength: 150
+        compressedData:
+          type: string
+          description: "A GZIP compressed JSON string of the JSON array of payment request fields.\r\n\r\n[Click here](/docs/payin-api/8hml1sj17dlnh-payment-request-and-result-fields) for more details regarding the payment request fields.\r\n\r\n[Click here](/docs/payin-api/q34dritp1xvlz-gzip-json-data) for more details on compressing and decompressing the JSON data."
+      required:
+        - jobReference
+        - notifyUrl
+        - compressedData
+      x-tags:
+        - bulkpaymentrequest
+      x-stoplight:
+        id: xruwvs2cnn19j
+    BulkPaymentResponse:
+      type: object
+      title: BulkPaymentResponse
+      properties:
+        jobId:
+          type: string
+          description: The identifier for the job created to process the bulk payment requests. No identifier is returned if there was an error creating the job or if the request submitted failed the initial validation.
+          format: uuid
+        jobReference:
+          type: string
+          description: The merchant reference for the job/batch that was passed in the create request.
+          maxLength: 100
+        errors:
+          type: array
+          description: Validation errors for the request.
+          items:
+            type: string
+      required:
+        - jobId
+        - jobReference
+      x-tags:
+        - bulkpaymentrequest
+      x-stoplight:
+        id: aavgbfvwcmj7x
+    BankDepositRequest:
+      type: object
+      title: BankDepositRequest
+      description: Request for creating a payment request.
+      properties:
+        siteCode:
+          type: string
+          description: A unique code for the site currently in use. A site code is generated when adding a site in the Ozow merchant admin section.
+          maxLength: 50
+        countryCode:
+          type: string
+          description: The ISO 3166-1 alpha-2 code for the user's country. The country code will determine which banks will be displayed to the customer. Please note only South African (ZA) banks are currently supported by Ozow.
+          pattern: '^[A-Z]+'
+          maxLength: 2
+          examples:
+            - ZA
+        currencyCode:
+          type: string
+          description: 'The ISO 4217 three-letter code for the transaction currency. Please note only the South African Rand (ZAR) is currently supported by Ozow, so any currency conversion must take place before posting to the Ozow site.'
+          pattern: '^[A-Z]+'
+          maxLength: 3
+          examples:
+            - ZAR
+        amount:
+          type: number
+          description: "The transaction amount. The amount is in the currency specified by the currency code posted.\r\n\r\n* *Accepted but not applicable for static references (multi-deposit)*"
+          format: double
+          examples:
+            - 150.2
+        transactionReference:
+          type: string
+          description: The merchant's reference for the transaction.
+          maxLength: 50
+        bankReference:
+          type: string
+          description: 'The reference that will be pre-populated in the "their reference" field in the customers online banking site. This is the payment reference that appears on the merchant’s bank statement and can be used for recon purposes. Only alphanumeric characters, spaces, and dashes are allowed.'
+          maxLength: 20
+        optional1:
+          type: string
+          description: 'Optional field the merchant can post for additional information they would need passed back in the response. These are also stored with the transaction details by Ozow, and can be useful for filtering transactions in the merchant admin section.'
+          maxLength: 50
+        optional2:
+          type: string
+          description: 'Optional field the merchant can post for additional information they would need passed back in the response. These are also stored with the transaction details by Ozow, and can be useful for filtering transactions in the merchant admin section.'
+          maxLength: 50
+        optional3:
+          type: string
+          description: 'Optional field the merchant can post for additional information they would need passed back in the response. These are also stored with the transaction details by Ozow, and can be useful for filtering transactions in the merchant admin section.'
+          maxLength: 50
+        optional4:
+          type: string
+          description: 'Optional field the merchant can post for additional information they would need passed back in the response. These are also stored with the transaction details by Ozow, and can be useful for filtering transactions in the merchant admin section.'
+          maxLength: 50
+        optional5:
+          type: string
+          description: 'Optional field the merchant can post for additional information they would need passed back in the response. These are also stored with the transaction details by Ozow, and can be useful for filtering transactions in the merchant admin section.'
+          maxLength: 50
+        customer:
+          type: string
+          description: The customer’s name or identifier.
+          maxLength: 100
+        cancelUrl:
+          type: string
+          description: 'The URL to which the redirect result should be posted to if the customer cancels the payment. This is also the page the customer will be redirected to. This URL can also be set for the applicable merchant site in the merchant admin section. If a value is set in the merchant admin and sent in the post, the posted value will be redirected to if the payment is cancelled.'
+          format: uri
+          maxLength: 150
+        successUrl:
+          type: string
+          description: "The URL to which the redirect result should be posted to if the payment is successful. This is also be the page the customer gets redirected to. This URL can also be set for the applicable merchant site in the merchant admin section. If a value is set\r\nin the merchant admin and sent in the post, the posted value will be redirected to if the payment was successful.\r\n\r\nPlease note that it is not sufficient to assume that the payment was successful simply because the customer has been redirected back to this page. It is highly recommended that you check the response fields as well as the transaction status using our check transaction status API call."
+          format: uri
+          maxLength: 150
+        notifyUrl:
+          type: string
+          description: "The URL that the notification result should be posted to. The result will post regardless of the outcome of the transaction. This URL can also be set for the applicable merchant site in the\r\nmerchant admin section. If a value is set in the merchant admin and sent in the post, the notification result will be sent to the posted value. Find out more in the notification response section in step 2."
+          format: uri
+          maxLength: 150
+        bankId:
+          type: string
+          description: "Ozow’s identifier for the bank, while this is not required it will help in future to make sure we return the correct instructions for the user.\r\n\r\nAllowed values: [Bank Identifiers](/docs/payin-api/branches/main/6fah7ggcpl94y-bank-connections#bank-identifiers)"
+          format: uuid
+        expiryDateUtc:
+          type: string
+          description: 'Payment will not be allowed to be made after this date. Date should be UTC and value should be formatted as yyyy-MM-dd HH:mm'
+          maxLength: 19
+          examples:
+            - '2015-08-11 16:02'
+        customerCell:
+          type: string
+          description: 'Merchant can provide customer cellphone number for faster login on certain banks. DO NOT include in the hash check string, just ignore instead.'
+          pattern: '^[0-9]+'
+          maxLength: 10
+          examples:
+            - '0794567855'
+        hashCheck:
+          type: string
+          description: 'SHA512 hash used to ensure that certain fields in the message have not been altered after the hash was generated. See [the generate hash section](/docs/payin-api/f1oidk1k60jc5-step-1-post-from-merchant-website#generate-post-hash-check) for more details on how to generate the hash.'
+          maxLength: 250
+      required:
+        - siteCode
+        - countryCode
+        - currencyCode
+        - amount
+        - transactionReference
+        - bankReference
+        - hashCheck
+      x-tags:
+        - bankdeposit
+      x-stoplight:
+        id: 53gaj4q667418
+    SingleBankDepositResponse:
+      type: object
+      title: SingleBankDepositResponse
+      properties:
+        transactionId:
+          type: string
+          description: Ozow transaction identifier. Transaction will be in a pending state after it is created and will be updated to complete after the payment has been received in our account
+          format: uuid
+        bankingDetails:
+          $ref: '#/components/schemas/BankingDetails'
+        url:
+          type: string
+          description: A URL that the user can be directed to where they will be displayed the banking details and instructions to use for the deposit
+          format: uri
+        errorMessage:
+          type: string
+          description: Error message generated when validating the request.
+          maxLength: 150
+      required:
+        - transactionId
+        - bankingDetails
+        - url
+      examples:
+        - transactionId: 75906707-8c31-479c-b354-aa805c4cefbc
+          bankingDetails:
+            bankName: string
+            branchCode: string
+            accountNumber: string
+            publicRecipientName: string
+            beneficiaryReference: string
+          url: 'http://example.com'
+          errorMessage: string
+      x-tags:
+        - bankdeposit
+      x-stoplight:
+        id: gl9nj1z8nzonf
+    BankingDetails:
+      type: object
+      title: BankingDetails
+      properties:
+        bankName:
+          type: string
+          description: Name of the bank the account is held at.
+          maxLength: 50
+        branchCode:
+          type: string
+          description: The destination branch code for the account
+          maxLength: 10
+        accountNumber:
+          type: string
+          description: The Ozow account number to use for deposit
+          maxLength: 20
+        publicRecipientName:
+          type: string
+          description: The name of the public recipient if applicable (depending whether a bankId was passed in the original request)
+          maxLength: 50
+        beneficiaryReference:
+          type: string
+          description: The reference to be used for the deposit
+          maxLength: 20
+      required:
+        - bankName
+        - branchCode
+        - accountNumber
+        - beneficiaryReference
+      x-tags:
+        - bankdeposit
+      x-stoplight:
+        id: afh08qqlak4l0
+    MultiBankDepositResponse:
+      type: object
+      title: MultiBankDepositResponse
+      properties:
+        bankDepositId:
+          type: string
+          description: "Ozow identifier for the bank deposit static reference. A new transaction will be created for each deposit received.\r\n\r\n* This id should be stored against the user so that the banking details can be queried"
+          format: uuid
+        bankingDetails:
+          $ref: '#/components/schemas/BankingDetails'
+        url:
+          type: string
+          description: A URL that the user can be directed to where they will be displayed the banking details and instructions to use for the deposit
+          format: uri
+        errorMessage:
+          type: string
+          description: Error message generated when validating the request.
+          maxLength: 150
+      required:
+        - bankDepositId
+        - bankingDetails
+        - url
+      examples:
+        - transactionId: 75906707-8c31-479c-b354-aa805c4cefbc
+          bankingDetails:
+            bankName: string
+            branchCode: string
+            accountNumber: string
+            publicRecipientName: string
+            beneficiaryReference: string
+          url: 'http://example.com'
+          errorMessage: string
+      x-tags:
+        - bankdeposit
+      x-stoplight:
+        id: emkt8wqiz6f6d
+    Transaction:
+      type: object
+      title: Transaction
+      description: Representation of a transaction in the Ozow system with it's outcome.
+      properties:
+        transactionId:
+          type: string
+          description: Ozow's unique reference for the transaction.
+          maxLength: 50
+        merchantCode:
+          type: string
+          description: Unique code assigned to each merchant.
+          maxLength: 50
+        siteCode:
+          type: string
+          description: The site code sent to Ozow in the request post.
+          maxLength: 50
+        transactionReference:
+          type: string
+          description: The merchant's transaction reference sent in the request post's TransactionReference variable.
+          maxLength: 50
+        currencyCode:
+          type: string
+          description: The transaction currency code sent in the request post.
+          maxLength: 3
+        amount:
+          type: number
+          description: The transaction amount. The amount is in the currency specified by the currency code posted.
+          format: double
+        status:
+          type: string
+          description: "The transaction status. Possible values are:\r\n1. Complete - The payment was successful.\r\n2. Cancelled - The payment was cancelled.\r\n3. Error - An error occurred while processing the payment.\r\n4. Abandoned – The payment was abandoned.\r\n5. PendingInvestigation – An inconclusive result was received by the bank and the payment needs to be verified manually.\r\n6. Pending – The status cannot be determined as yet but will be reposted to the notification URL as soon as it has been determined. Merchants not using the notification URL will receive a PendingInvestigation status."
+          maxLength: 50
+          examples:
+            - Complete
+        statusMessage:
+          type: string
+          description: Message regarding the status of the transaction. This field will not always have a value. This is a user friendly message that can be displayed to the user e.g. User cancelled transaction.
+          maxLength: 150
+        createdDate:
+          type: string
+          description: Transaction created date and time.
+          examples:
+            - '2024-01-02 14:22'
+        paymentDate:
+          type: string
+          description: Transaction payment date and time.
+          examples:
+            - '2024-01-02 14:25'
+        subStatus:
+          type: string
+          description: "The transaction sub status for failed transactions. The value provides an indication as to why the payment failed.\r\n\r\nSome examples:\r\n• Unclassified – Failure scenario has not been mapped\r\n• InsufficientFunds - User did not have sufficient funds\r\navailable to complete the payment\r\n\r\nWhile there are several sub-statuses, they have not been included here as they are strictly for reporting."
+          maxLength: 50
+        bankName:
+          type: string
+          description: The name of the bank the payment was made from.
+          maxLength: 50
+        maskedAccountNumber:
+          type: string
+          description: "The masked account number the payment was made from.\r\n\r\nIf account number is 12 or more digits then the first and last four digits are unmasked e.g. 1234567898765 will be masked as\r\n1234*****8765\r\n\r\nIf the account number is less than12 digits then the first and last 3 digits are left unmasked e.g. 123456789 will be masked as 123***789\r\n\r\n**This is not available by default and a request by the merchant must be submitted along with a justification for requiring this information.**"
+          maxLength: 50
+          examples:
+            - 1234*****8765
+        smartIndicators:
+          type: string
+          description: "Some Ozow merchants have requested this information as they use this in their own processes. The can be ignored unless you have a purpose and application for this information. The application of these indicators are for the merchant’s discretion and in isolation do not constitute any action to be taken by the merchant.\r\n\r\nThe field will contain a pipe delimited list of the following values if they are applicable e.g. HIGH_VALUE | FIRST_OZOW :\r\n\r\n* HIGH_VALUE – If a soft limit is configured on the site and the amount paid is higher or equal to the configured limit\r\n* FIRST_OZOW – First time a user has paid using Ozow\r\n* FIRST_MERCHANT – First time a user has paid the merchant using Ozow\r\n* NEW_OZOW – User has paid using Ozow for the first time in the past seven days\r\n* NEW_MERCHANT - User has paid the merchant using Ozow for the first time in the past seven days"
+          pattern: HIGH_VALUE|FIRST_OZOW
+          maxLength: 500
+          examples:
+            - HIGH_VALUE|FIRST_OZOW
+      required:
+        - transactionId
+        - merchantCode
+        - siteCode
+        - transactionReference
+        - currencyCode
+        - amount
+        - status
+        - createdDate
+      x-tags:
+        - payments
+      x-stoplight:
+        id: qccb7fkuqabd1
